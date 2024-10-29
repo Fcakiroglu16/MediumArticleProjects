@@ -1,0 +1,6 @@
+services:
+  microserviceone.api:
+    image: microserviceone.api:v1
+    build:
+      context: .
+      dockerfile: MicroserviceOne.API/Dockerfile
