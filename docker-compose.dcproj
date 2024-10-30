@@ -16,4 +16,9 @@
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="deployment.yml" />
+    <Content Include="ingress.yml" />
+    <Content Include="service.yml" />
+  </ItemGroup>
 </Project>

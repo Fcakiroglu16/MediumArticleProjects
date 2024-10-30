@@ -1,0 +1,44 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice-one
+spec:
+  replicas: 2  # Number of pods to run the application
+  selector:
+    matchLabels:
+      app: microserviceoneapi-label
+  template:
+    metadata:
+      labels:
+        app: microserviceoneapi-label
+    spec:
+      containers:
+        - name: microserviceoneapi-container
+          image: microserviceone.api:v1   # Name of the Docker image
+          imagePullPolicy: Never     # Always pull the latest image
+          ports:
+            - containerPort: 8080  # Port within the container for the application
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Development"
+            - name: ASPNETCORE_HTTP_PORTS
+              value: "8080"
+          resources:
+            requests:
+              memory: "128Mi"  # Minimum memory required for the pod (in mebibytes => 128 MB)
+              cpu: "250m"       # Minimum CPU required for the pod
+            limits:
+              memory: "256Mi"  # Maximum memory the pod can use
+              cpu: "500m"       # Maximum CPU the pod can use
+          livenessProbe:
+            httpGet:
+              path: "/health/liveness"  # Endpoint used for liveness check
+              port: 8080
+            initialDelaySeconds: 30  # Time to wait after pod start before beginning liveness checks
+            periodSeconds: 10  # Frequency of the liveness check
+          readinessProbe:
+            httpGet:
+              path: "/health/readiness"  # Endpoint used for readiness check
+              port: 8080
+            initialDelaySeconds: 5  # Time to wait after pod start before beginning readiness checks
+            periodSeconds: 10  # Frequency of the readiness check
