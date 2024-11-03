@@ -1,4 +1,4 @@
-﻿apiVersion: apps/v1
+﻿﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: microservice-one
@@ -23,6 +23,8 @@ spec:
               value: "Development"
             - name: ASPNETCORE_HTTP_PORTS
               value: "8080"
+            - name: OtelCollector__BaseUrl
+              value: "http://otel-collector-opentelemetry-collector:4317"
           resources:
             requests:
               memory: "128Mi"  # Minimum memory required for the pod (in mebibytes => 128 MB)
@@ -42,3 +44,15 @@ spec:
               port: 8080
             initialDelaySeconds: 5  # Time to wait after pod start before beginning readiness checks
             periodSeconds: 10  # Frequency of the readiness check
+---
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: microserviceoneapi-service
+spec:
+  selector:
+    app: microserviceoneapi-label
+  ports:
+    - protocol: TCP
+      port: 8080  # Servisin dışarıya açacağı port
+      targetPort: 8080  # Container'ın dinleyeceği port

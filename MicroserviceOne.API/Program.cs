@@ -1,4 +1,7 @@
-using Microsoft.Extensions.Diagnostics.HealthChecks;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +10,30 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks();
+
+builder.Services.AddOpenTelemetry().WithTracing(o =>
+{
+    o.ConfigureResource(r => r.AddService("microservice.one", "v1"));
+
+    o.AddAspNetCoreInstrumentation();
+    o.AddHttpClientInstrumentation();
+
+
+    o.AddConsoleExporter();
+    o.AddOtlpExporter(x => { x.Endpoint = new Uri(builder.Configuration.GetSection("OtelCollector")["BaseUrl"]!); });
+}).WithMetrics(o =>
+{
+    o.ConfigureResource(r => r.AddService("microservice.one", "v1"));
+    o.AddProcessInstrumentation();
+    o.AddRuntimeInstrumentation();
+    o.AddOtlpExporter(x => { x.Endpoint = new Uri(builder.Configuration.GetSection("OtelCollector")["BaseUrl"]!); });
+}).WithLogging(o =>
+{
+    o.AddOtlpExporter(x => { x.Endpoint = new Uri(builder.Configuration.GetSection("OtelCollector")["BaseUrl"]!); });
+    o.ConfigureResource(r => { r.AddService("microservice.one", "v1"); });
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,13 +52,13 @@ app.MapHealthChecks("/health/readiness").AllowAnonymous(); // Readiness Probe
 
 #region Product Endpoints
 
-var products = new List<Product>()
+var products = new List<Product>
 {
-    new Product { Id = 1, Name = "Keyboard", Price = 20 },
-    new Product { Id = 2, Name = "Mouse", Price = 10 },
-    new Product { Id = 3, Name = "Monitor", Price = 100 },
-    new Product { Id = 4, Name = "Laptop", Price = 500 },
-    new Product { Id = 5, Name = "Tablet", Price = 300 }
+    new() { Id = 1, Name = "Keyboard", Price = 20 },
+    new() { Id = 2, Name = "Mouse", Price = 10 },
+    new() { Id = 3, Name = "Monitor", Price = 100 },
+    new() { Id = 4, Name = "Laptop", Price = 500 },
+    new() { Id = 5, Name = "Tablet", Price = 300 }
 };
 
 app.MapGet("/products", () => Results.Ok(products));
@@ -44,6 +71,10 @@ app.MapGet("/products/{id}", (int id) =>
 
 app.MapPost("/products", (Product product) =>
 {
+    var httpClient = new HttpClient();
+    var response = httpClient.GetAsync("https://www.google.com");
+
+
     product.Id = products.Count > 0 ? products.Max(p => p.Id) + 1 : 1;
     products.Add(product);
     return Results.Created($"/products/{product.Id}", product);
@@ -52,10 +83,7 @@ app.MapPost("/products", (Product product) =>
 app.MapPut("/products/{id}", (int id, Product updatedProduct) =>
 {
     var product = products.FirstOrDefault(p => p.Id == id);
-    if (product is null)
-    {
-        return Results.NotFound();
-    }
+    if (product is null) return Results.NotFound();
 
     product.Name = updatedProduct.Name;
     product.Price = updatedProduct.Price;
@@ -66,10 +94,7 @@ app.MapPut("/products/{id}", (int id, Product updatedProduct) =>
 app.MapDelete("/products/{id}", (int id) =>
 {
     var product = products.FirstOrDefault(p => p.Id == id);
-    if (product is null)
-    {
-        return Results.NotFound();
-    }
+    if (product is null) return Results.NotFound();
 
     products.Remove(product);
     return Results.NoContent();

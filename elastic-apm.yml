@@ -1,0 +1,12 @@
+elasticsearch:
+  hosts:
+    - "https://elasticsearch-master:9200"  # Elasticsearch'in TLS etkin endpoint'i
+  ssl:
+    certificateAuthorities: "/usr/share/apm-server/config/certs/ca.crt"
+volumeMounts:
+  - name: certs
+    mountPath: "/usr/share/apm-server/config/certs"
+volumes:
+  - name: certs
+    secret:
+      secretName: elasticsearch-master-certs

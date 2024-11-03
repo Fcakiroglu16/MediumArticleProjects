@@ -10,15 +10,20 @@
     <DockerServiceName>microserviceone.api</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="deployment-and-service.yml" />
     <None Include="docker-compose.override.yml">
       <DependentUpon>docker-compose.yml</DependentUpon>
     </None>
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
+    <None Include="elastic-apm.yml" />
+    <None Include="otel-collector.yaml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="deployment.yml" />
+    <Content Include="elastic-deplyment-service.yml" />
     <Content Include="ingress.yml" />
+    <Content Include="ReadMe.txt" />
     <Content Include="service.yml" />
   </ItemGroup>
 </Project>

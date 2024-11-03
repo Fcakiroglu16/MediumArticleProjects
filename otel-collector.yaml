@@ -1,0 +1,32 @@
+﻿mode: deployment 
+image:
+  repository: "otel/opentelemetry-collector-contrib"
+  tag: "0.112.0" 
+
+config:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: "0.0.0.0:4317"  # gRPC endpoint
+        http:
+          endpoint: "0.0.0.0:4318"  # HTTP endpoint
+
+  exporters:
+    otlp:
+      endpoint: "http://apm-server-apm-server:8200"  # APM Server'ın adresini belirtin
+      tls:
+        insecure: true
+
+  service:
+    pipelines:
+      traces:
+        receivers: [otlp]
+        exporters: [otlp]
+      metrics:
+        receivers: [otlp]
+        exporters: [otlp]
+      logs:
+        receivers: [otlp]
+        exporters: [otlp]
+
