@@ -8,13 +8,13 @@ config:
     otlp:
       protocols:
         grpc:
-          endpoint: "0.0.0.0:4317"  # gRPC endpoint
+          endpoint: "0.0.0.0:4317"  
         http:
-          endpoint: "0.0.0.0:4318"  # HTTP endpoint
+          endpoint: "0.0.0.0:4318"  
 
   exporters:
     otlp:
-      endpoint: "http://apm-server-apm-server:8200"  # APM Server'ın adresini belirtin
+      endpoint: "http://apm-server-apm-server:8200"  
       tls:
         insecure: true
 
