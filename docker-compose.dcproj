@@ -16,8 +16,6 @@
     </None>
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
-    <None Include="elastic-apm.yml" />
-    <None Include="otel-collector.yaml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="deployment.yml" />

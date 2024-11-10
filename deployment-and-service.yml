@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: microservice-one
 spec:
-  replicas: 2  # Number of pods to run the application
+  replicas: 1  # Number of pods to run the application
   selector:
     matchLabels:
       app: microserviceoneapi-label
@@ -54,5 +54,5 @@ spec:
     app: microserviceoneapi-label
   ports:
     - protocol: TCP
-      port: 8080  # Servisin dışarıya açacağı port
-      targetPort: 8080  # Container'ın dinleyeceği port
+      port: 8080 
+      targetPort: 8080 
