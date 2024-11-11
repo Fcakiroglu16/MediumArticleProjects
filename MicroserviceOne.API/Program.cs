@@ -11,28 +11,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks();
 
-builder.Services.AddOpenTelemetry().WithTracing(o =>
-{
-    o.ConfigureResource(r => r.AddService("microservice.one", "v1"));
-
-    o.AddAspNetCoreInstrumentation();
-    o.AddHttpClientInstrumentation();
-
-
-    o.AddConsoleExporter();
-    o.AddOtlpExporter(x => { x.Endpoint = new Uri(builder.Configuration.GetSection("OtelCollector")["BaseUrl"]!); });
-}).WithMetrics(o =>
-{
-    o.ConfigureResource(r => r.AddService("microservice.one", "v1"));
-    o.AddProcessInstrumentation();
-    o.AddRuntimeInstrumentation();
-    o.AddOtlpExporter(x => { x.Endpoint = new Uri(builder.Configuration.GetSection("OtelCollector")["BaseUrl"]!); });
-}).WithLogging(o =>
-{
-    o.AddOtlpExporter(x => { x.Endpoint = new Uri(builder.Configuration.GetSection("OtelCollector")["BaseUrl"]!); });
-    o.ConfigureResource(r => { r.AddService("microservice.one", "v1"); });
-});
-
 
 var app = builder.Build();
 
